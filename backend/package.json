@@ -1,0 +1,23 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "FAPI objednávkový systém - backend",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "axios": "^1.13.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.1.4",
+    "express": "^4.22.1",
+    "xml2js": "^0.5.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.11",
+    "supertest": "^6.3.3"
+  }
+}

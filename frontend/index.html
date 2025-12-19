@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <title>Objednávková stránka</title>
+</head>
+<body>
+
+  <h1>Objednávková stránka</h1>
+
+  <form id="orderForm">
+    <input name="name" placeholder="Jméno" required><br><br>
+    <input name="street" placeholder="Ulice a číslo" required>
+    <input name="city" placeholder="Město" required>
+    <input name="zip" placeholder="PSČ" required><br><br>
+    <input name="email" placeholder="Email" required><br><br>
+    <input name="phone" placeholder="Telefon" required><br><br>
+    <select name="product" id="product"></select><br>
+    <p>Počet kusů:</p>
+    <input name="quantity" type="number" value="1" min="1" id="quantity"><br><br>
+
+    <hr>
+
+    <p>Celková cena (s DPH): <strong><span id="price">0</span> CZK</strong></p>
+    
+    <hr>
+
+    <button type="submit">Odeslat objednávku</button>
+  </form>
+
+  <script>
+    const form = document.querySelector("#orderForm");
+    const productSelect = document.querySelector("#product");
+    const quantityInput = document.querySelector("#quantity");
+    const priceSpan = document.querySelector("#price");
+
+    let products = [];
+
+    // Načtení produktů z backendu
+    fetch("http://localhost:4000/products")
+      .then(res => res.json())
+      .then(data => {
+        products = data;
+
+        productSelect.innerHTML = data.map(p =>
+          `<option value="${p.id}">${p.name}</option>`
+        ).join("");
+
+        updatePrice();
+      });
+      // Výpočet ceny
+    function updatePrice() {
+      const product = products.find(p => p.id == productSelect.value);
+      if (!product) return;
+
+      const quantity = Number(quantityInput.value);
+      const total = product.price * quantity * 1.21; // DPH
+      priceSpan.textContent = total.toFixed(2);
+    }
+    productSelect.addEventListener("change", updatePrice);
+    quantityInput.addEventListener("input", updatePrice);
+
+    // Odesílání zpět na backend
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+
+      const res = await fetch("http://localhost:4000/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            name: form.name.value,
+            email: form.email.value,
+            phone: form.phone.value,
+            street: form.street.value,
+            city: form.city.value,
+            zip: form.zip.value,
+          productId: Number(productSelect.value),
+          quantity: Number(quantityInput.value)
+        })
+      });
+
+      const order = await res.json();
+      sessionStorage.setItem("order", JSON.stringify(order));
+      window.location.href = "thankyou.html";
+    });
+  </script>
+
+</body>
+</html>
