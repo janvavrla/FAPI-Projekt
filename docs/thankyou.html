@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <title>Děkovací stránka</title>
+</head>
+<body>
+  <h1>Rekapitulace objednávky</h1>
+  <div id="summary"></div>
+  <button onclick="window.location.href='index.html'">
+  Zpět na začátek
+</button>
+
+
+  <script>
+  const summaryDiv = document.querySelector("#summary");
+  // načtení dat z backendu po odeslání formuláře
+  const order = JSON.parse(sessionStorage.getItem("order"));
+
+  if (order) {
+    const vatRate = 0.21;
+
+    const czkWithoutVat = (order.totalCZK / (1 + vatRate)).toFixed(2);
+    const eurWithoutVat = (order.totalEUR / (1 + vatRate)).toFixed(2);
+
+    summaryDiv.innerHTML = `
+      <hr>
+
+
+      <h2>Dodací údaje:</h2>
+      <p><strong>Jméno: </strong>${order.name}</p>
+      <p><strong>Adresa doručení: </strong>${order.street}    ${order.zip}    ${order.city}</p>
+      <p><strong>Tel:</strong> ${order.phone}</p>
+      <p><strong>Email:</strong> ${order.email}</p>
+      
+      <hr>
+      
+      <p><strong>Produkt:</strong> ${order.product}</p>
+      <p><strong>Počet kusů:</strong> ${order.quantity}</p>
+
+      <hr>
+
+      <h3>Cena v CZK</h3>
+      <p>Cena bez DPH: <strong>${czkWithoutVat} CZK</strong></p>
+      <p>Cena s DPH (21 %): <strong>${order.totalCZK.toFixed(2)} CZK</strong></p>
+
+      <hr>
+
+      <h3>Cena v EUR (dle kurzu ČNB)</h3>
+      <p>Cena bez DPH: <strong>${eurWithoutVat} EUR</strong></p>
+      <p>Cena s DPH (21 %): <strong>${order.totalEUR} EUR</strong></p>
+
+      <hr>
+            <h2>Děkujeme za Vaši objednávku!</h2>
+      <hr>
+    `;
+  } else {
+    summaryDiv.innerHTML = "<p>Žádná objednávka nebyla nalezena.</p>";
+  }
+</script>
+
+
+</body>
+</html>
